@@ -1,4 +1,5 @@
 import { getYNABApi, getBudgetId, milliunitsToAmount, getLastNMonths } from './client';
+import { classifySpending, type SpendingBreakdown } from './spending';
 import type {
   SpendingByCategory,
   MonthlySpending,
@@ -160,4 +161,16 @@ export async function fetchBudgetSummary() {
     onBudgetBalance,
     accountsCount: accounts.length,
   };
+}
+
+// Fetch spending breakdown by type (Living, Fixed, Credit Cards)
+export async function fetchSpendingBreakdown(month?: string): Promise<SpendingBreakdown> {
+  const api = getYNABApi();
+  const budgetId = getBudgetId();
+  const targetMonth = month || getLastNMonths(1)[0];
+
+  const response = await api.months.getBudgetMonth(budgetId, targetMonth);
+  const categories = response.data.month.categories;
+
+  return classifySpending(categories);
 }

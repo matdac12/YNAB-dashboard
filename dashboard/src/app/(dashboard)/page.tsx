@@ -1,13 +1,11 @@
 import { Suspense } from 'react';
 import { OverviewCards } from '@/components/dashboard/overview-cards';
-import { SpendingChart } from '@/components/dashboard/spending-chart';
-import { CategoryBreakdown } from '@/components/dashboard/category-breakdown';
+import { SpendingBreakdown } from '@/components/dashboard/spending-breakdown';
 import { AccountsList } from '@/components/dashboard/accounts-list';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   fetchBudgetSummary,
-  fetchMonthlySpending,
-  fetchSpendingByCategory,
+  fetchSpendingBreakdown,
   fetchAccountsSummary,
 } from '@/lib/ynab/data';
 
@@ -22,10 +20,9 @@ function LoadingCards() {
 }
 
 async function DashboardContent() {
-  const [summary, monthlySpending, categorySpending, accounts] = await Promise.all([
+  const [summary, spendingBreakdown, accounts] = await Promise.all([
     fetchBudgetSummary(),
-    fetchMonthlySpending(6),
-    fetchSpendingByCategory(),
+    fetchSpendingBreakdown(),
     fetchAccountsSummary(),
   ]);
 
@@ -33,10 +30,7 @@ async function DashboardContent() {
     <>
       <OverviewCards data={summary} />
 
-      <div className="grid gap-4 lg:grid-cols-2 mt-6">
-        <SpendingChart data={monthlySpending} />
-        <CategoryBreakdown data={categorySpending} />
-      </div>
+      <SpendingBreakdown data={spendingBreakdown} />
 
       <div className="mt-6">
         <AccountsList accounts={accounts} />
