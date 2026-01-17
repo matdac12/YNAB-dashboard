@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { fetchAccountsSummary } from '@/lib/ynab/data';
+import { fetchAllAccounts } from '@/lib/ynab/data';
 import { NetWorthClient } from './client';
 
 function LoadingSkeleton() {
@@ -18,7 +18,8 @@ function LoadingSkeleton() {
 }
 
 async function NetWorthData() {
-  const accounts = await fetchAccountsSummary();
+  // Use fetchAllAccounts to include tracking accounts (savings, investments)
+  const accounts = await fetchAllAccounts();
 
   // Calculate totals
   const assets = accounts

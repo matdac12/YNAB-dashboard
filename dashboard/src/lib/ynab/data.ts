@@ -16,7 +16,7 @@ export async function fetchBudgetData() {
   return response.data.budget;
 }
 
-// Fetch accounts summary
+// Fetch accounts summary (on-budget only, used by most pages)
 export async function fetchAccountsSummary(): Promise<AccountSummary[]> {
   const api = getYNABApi();
   const budgetId = getBudgetId();
@@ -25,6 +25,24 @@ export async function fetchAccountsSummary(): Promise<AccountSummary[]> {
 
   return response.data.accounts
     .filter(acc => !acc.deleted && !acc.closed && acc.on_budget)
+    .map(acc => ({
+      id: acc.id,
+      name: acc.name,
+      type: acc.type,
+      balance: acc.balance,
+      onBudget: acc.on_budget,
+    }));
+}
+
+// Fetch all accounts including tracking accounts (for net worth page)
+export async function fetchAllAccounts(): Promise<AccountSummary[]> {
+  const api = getYNABApi();
+  const budgetId = getBudgetId();
+
+  const response = await api.accounts.getAccounts(budgetId);
+
+  return response.data.accounts
+    .filter(acc => !acc.deleted && !acc.closed)
     .map(acc => ({
       id: acc.id,
       name: acc.name,
