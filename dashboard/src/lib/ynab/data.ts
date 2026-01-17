@@ -24,7 +24,7 @@ export async function fetchAccountsSummary(): Promise<AccountSummary[]> {
   const response = await api.accounts.getAccounts(budgetId);
 
   return response.data.accounts
-    .filter(acc => !acc.deleted && !acc.closed)
+    .filter(acc => !acc.deleted && !acc.closed && acc.on_budget)
     .map(acc => ({
       id: acc.id,
       name: acc.name,
@@ -144,12 +144,10 @@ export async function fetchBudgetSummary() {
   ]);
 
   const month = monthResponse.data.month;
-  const accounts = accountsResponse.data.accounts.filter(a => !a.deleted && !a.closed);
+  const accounts = accountsResponse.data.accounts.filter(a => !a.deleted && !a.closed && a.on_budget);
 
   const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
-  const onBudgetBalance = accounts
-    .filter(acc => acc.on_budget)
-    .reduce((sum, acc) => sum + acc.balance, 0);
+  const onBudgetBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
   return {
     toBeBudgeted: month.to_be_budgeted,

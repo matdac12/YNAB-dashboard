@@ -26,12 +26,8 @@ const accountIcons: Record<string, typeof Wallet> = {
 };
 
 export function AccountsList({ accounts }: AccountsListProps) {
-  // Separate on-budget and off-budget accounts
-  const onBudget = accounts.filter(acc => acc.onBudget);
-  const offBudget = accounts.filter(acc => !acc.onBudget);
-
-  const totalOnBudget = onBudget.reduce((sum, acc) => sum + acc.balance, 0);
-  const totalOffBudget = offBudget.reduce((sum, acc) => sum + acc.balance, 0);
+  // All accounts are now on-budget (off-budget accounts filtered at data layer)
+  const totalBalance = accounts.reduce((sum, acc) => sum + acc.balance, 0);
 
   const renderAccount = (account: AccountSummary) => {
     const Icon = accountIcons[account.type] || Wallet;
@@ -60,30 +56,16 @@ export function AccountsList({ accounts }: AccountsListProps) {
         <CardDescription>Your account balances</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {onBudget.length > 0 && (
+        {accounts.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-2">
               <h4 className="text-sm font-semibold text-muted-foreground">Budget Accounts</h4>
-              <span className={`text-sm font-bold ${totalOnBudget >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(totalOnBudget)}
+              <span className={`text-sm font-bold ${totalBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatCurrency(totalBalance)}
               </span>
             </div>
             <div className="space-y-1">
-              {onBudget.map(renderAccount)}
-            </div>
-          </div>
-        )}
-
-        {offBudget.length > 0 && (
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-muted-foreground">Tracking Accounts</h4>
-              <span className={`text-sm font-bold ${totalOffBudget >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatCurrency(totalOffBudget)}
-              </span>
-            </div>
-            <div className="space-y-1">
-              {offBudget.map(renderAccount)}
+              {accounts.map(renderAccount)}
             </div>
           </div>
         )}
