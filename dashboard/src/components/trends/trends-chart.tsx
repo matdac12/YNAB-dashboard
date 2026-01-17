@@ -13,35 +13,38 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Legend,
-  ResponsiveContainer,
 } from 'recharts';
-import type { MonthlyTrendPoint, CategoryTrendData } from '@/lib/ynab/trends';
-import { CATEGORY_COLORS } from '@/lib/ynab/trends';
+import type { MonthlySpendingTypePoint, SpendingTypeKey } from '@/lib/ynab/trends';
+import { SPENDING_TYPE_COLORS, SPENDING_TYPE_LABELS } from '@/lib/ynab/trends';
 
 interface TrendsChartProps {
-  data: MonthlyTrendPoint[];
-  categories: CategoryTrendData[];
+  data: MonthlySpendingTypePoint[];
 }
 
-export function TrendsChart({ data, categories }: TrendsChartProps) {
-  const topCategories = categories.slice(0, 5);
+const SPENDING_TYPES: SpendingTypeKey[] = ['living', 'fixed', 'creditCards'];
 
-  // Build chart config dynamically
-  const chartConfig = topCategories.reduce((config, cat, index) => {
-    config[cat.categoryName] = {
-      label: cat.categoryName,
-      color: CATEGORY_COLORS[index % CATEGORY_COLORS.length],
-    };
-    return config;
-  }, {} as ChartConfig);
+const chartConfig: ChartConfig = {
+  living: {
+    label: SPENDING_TYPE_LABELS.living,
+    color: SPENDING_TYPE_COLORS.living,
+  },
+  fixed: {
+    label: SPENDING_TYPE_LABELS.fixed,
+    color: SPENDING_TYPE_COLORS.fixed,
+  },
+  creditCards: {
+    label: SPENDING_TYPE_LABELS.creditCards,
+    color: SPENDING_TYPE_COLORS.creditCards,
+  },
+};
 
+export function TrendsChart({ data }: TrendsChartProps) {
   if (data.length === 0) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Spending Trends</CardTitle>
-          <CardDescription>Category spending over time</CardDescription>
+          <CardDescription>Spending by type over time</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex h-[300px] items-center justify-center">
@@ -56,7 +59,7 @@ export function TrendsChart({ data, categories }: TrendsChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>Spending Trends</CardTitle>
-        <CardDescription>Top 5 categories over the last 6 months</CardDescription>
+        <CardDescription>Spending by type over the last 6 months</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[350px] w-full">
@@ -83,12 +86,13 @@ export function TrendsChart({ data, categories }: TrendsChartProps) {
                 />
               }
             />
-            {topCategories.map((cat, index) => (
+            {SPENDING_TYPES.map((type) => (
               <Line
-                key={cat.categoryId}
+                key={type}
                 type="monotone"
-                dataKey={cat.categoryName}
-                stroke={CATEGORY_COLORS[index % CATEGORY_COLORS.length]}
+                dataKey={type}
+                name={SPENDING_TYPE_LABELS[type]}
+                stroke={SPENDING_TYPE_COLORS[type]}
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
@@ -99,13 +103,13 @@ export function TrendsChart({ data, categories }: TrendsChartProps) {
 
         {/* Legend */}
         <div className="flex flex-wrap gap-4 mt-4 justify-center">
-          {topCategories.map((cat, index) => (
-            <div key={cat.categoryId} className="flex items-center gap-2">
+          {SPENDING_TYPES.map((type) => (
+            <div key={type} className="flex items-center gap-2">
               <div
                 className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: CATEGORY_COLORS[index % CATEGORY_COLORS.length] }}
+                style={{ backgroundColor: SPENDING_TYPE_COLORS[type] }}
               />
-              <span className="text-sm">{cat.categoryName}</span>
+              <span className="text-sm">{SPENDING_TYPE_LABELS[type]}</span>
             </div>
           ))}
         </div>

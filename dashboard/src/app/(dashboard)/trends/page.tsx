@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendsChart } from '@/components/trends/trends-chart';
 import { TrendsTable } from '@/components/trends/trends-table';
-import { fetchCategoryTrends } from '@/lib/ynab/trends';
+import { fetchCategoryTrends, fetchSpendingTypeTrends } from '@/lib/ynab/trends';
 
 function LoadingSkeleton() {
   return (
@@ -14,11 +14,14 @@ function LoadingSkeleton() {
 }
 
 async function TrendsContent() {
-  const { categories, chartData } = await fetchCategoryTrends(6);
+  const [{ categories }, { chartData: typeChartData }] = await Promise.all([
+    fetchCategoryTrends(6),
+    fetchSpendingTypeTrends(6),
+  ]);
 
   return (
     <div className="space-y-6">
-      <TrendsChart data={chartData} categories={categories} />
+      <TrendsChart data={typeChartData} />
       <TrendsTable categories={categories} />
     </div>
   );
